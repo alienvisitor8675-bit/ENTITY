@@ -13,6 +13,7 @@ DATA_PATHS=[
   "tools/datachip_workspace_ui.py",
   "tools/blackmore_aurora_qt.py",
   "design/blackmore-aurora.tokens.json",
+  "design/assets/blackmore_mark.png",
   "src/01_Core_Runtime/identity/canonical_identity.py",
   "src/11_ADAM/full_runtime",
   "src/22_Sovereign_Domain",

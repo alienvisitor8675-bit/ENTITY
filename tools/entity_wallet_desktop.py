@@ -2283,7 +2283,19 @@ class WalletWindow(QtWidgets.QMainWindow):
 
         side = QtWidgets.QFrame(); side.setObjectName("sidebar"); side.setFixedWidth(238)
         sl = QtWidgets.QVBoxLayout(side); sl.setContentsMargins(18, 22, 18, 20); sl.setSpacing(7)
-        sl.addWidget(Ui.label("ENTITY", "brand"))
+        brand_row=QtWidgets.QHBoxLayout()
+        brand_asset=repo_root()/"design"/"assets"/"blackmore_mark.png"
+        if brand_asset.is_file():
+            mark=QtGui.QPixmap(str(brand_asset))
+            if not mark.isNull():
+                mark_label=QtWidgets.QLabel()
+                mark_label.setPixmap(mark.scaled(45,45,QtCore.Qt.KeepAspectRatio,
+                                                QtCore.Qt.SmoothTransformation))
+                mark_label.setToolTip("Blackmore Technology Group")
+                brand_row.addWidget(mark_label)
+        brand_row.addWidget(Ui.label("ENTITY", "brand"))
+        brand_row.addStretch()
+        sl.addLayout(brand_row)
         sl.addWidget(Ui.label("BLACKMORE AURORA  /  CAPABILITY ECONOMY", "brandSub"))
         sl.addSpacing(24)
         self.nav_buttons = {}
@@ -3398,6 +3410,9 @@ def main():
     app.setStyle("Fusion")
     app.setStyleSheet(startup_stylesheet() + AURORA.stylesheet())
     app.setPalette(AURORA.palette())
+    icon_path=repo_root()/"design"/"assets"/"blackmore_mark.png"
+    if icon_path.is_file():
+        app.setWindowIcon(QtGui.QIcon(str(icon_path)))
 
     if not args.entity:
         setup = EntitySetupDialog(None, onboarding)

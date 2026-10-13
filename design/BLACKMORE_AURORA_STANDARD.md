@@ -70,3 +70,7 @@ Use `Segoe UI` with `Cascadia Code`/Consolas for hashes, identifiers and graph p
 - .NET desktop: `design/adapters/dotnet/BlackmoreAurora.cs`
 
 Generate all adapters from the one token source with `python tools/generate_blackmore_aurora_adapters.py`; CI enforces `--check` for exact bytes. Platform hosts independently implement UI interactions, dynamic sizing and accessibility. Generated color constants are not an installed app, permission manifest or production runtime.
+
+## First-party visual signature
+
+The Blackmore B/mountain mark is the authentic asset already used by the public ENTITY documentation portal, not an approximate new logo. Wallet packages `design/assets/blackmore_mark.png` for native headers and application icons; Nexus packages the same PNG/ICO while preserving service identities and installed state. Avoid replacing it with a generated wordmark or distributing third-party fonts.
