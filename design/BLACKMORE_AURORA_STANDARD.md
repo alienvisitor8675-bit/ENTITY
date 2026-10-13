@@ -60,3 +60,13 @@ Use `Segoe UI` with `Cascadia Code`/Consolas for hashes, identifiers and graph p
 **Naming decision:** use `Blackmore Nexus` as the **proposed outward-facing product name**, while retaining existing CLI, app IDs, ports, device enrollment and service identifiers until a controlled migration is approved.
 
 **Release boundary:** this design rollout creates no new KMS key, financial instrument, issuer rights, third-party permission, deployment authority or value-state promotion.
+
+## Native/mobile integration adapters (portable and deterministic)
+
+- SwiftUI / iOS: `design/adapters/ios/BlackmoreAurora.swift`
+- Android Jetpack Compose: `design/adapters/android/BlackmoreAurora.kt`
+- TypeScript / React and Web Components: `design/adapters/web/aurora-tokens.ts`
+- Portable CSS variables: `design/adapters/web/aurora-tokens.css`
+- .NET desktop: `design/adapters/dotnet/BlackmoreAurora.cs`
+
+Generate all adapters from the one token source with `python tools/generate_blackmore_aurora_adapters.py`; CI enforces `--check` for exact bytes. Platform hosts independently implement UI interactions, dynamic sizing and accessibility. Generated color constants are not an installed app, permission manifest or production runtime.
