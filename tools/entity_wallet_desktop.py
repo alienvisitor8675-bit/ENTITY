@@ -3,22 +3,23 @@ from pathlib import Path
 import argparse, hashlib, html, importlib.util, json, os, sqlite3, sys, time, uuid
 
 from PySide6 import QtCore, QtGui, QtWidgets
+import blackmore_aurora_qt as AURORA
 
-APP_NAME = "ENTITY Workspace — DataChips"
+APP_NAME = "ENTITY | Aurora Capability Workspace"
 VERSION = "3.4.3-composer-qualification"
 
-ROOT_BG = "#090B0E"
-SIDEBAR_BG = "#0D1014"
-PANEL_BG = "#11151A"
-PANEL_2 = "#151A20"
-BORDER = "#242B34"
-TEXT = "#F3F0E8"
-MUTED = "#8F99A7"
-ACCENT = "#C9A96A"
-ACCENT_DARK = "#7D6642"
-GREEN = "#43D39E"
-RED = "#FF6B78"
-YELLOW = "#E3BC64"
+ROOT_BG = "#08121F"
+SIDEBAR_BG = "#0B1728"
+PANEL_BG = "#101F32"
+PANEL_2 = "#142740"
+BORDER = "#29435F"
+TEXT = "#F4F8FF"
+MUTED = "#9CB3CF"
+ACCENT = "#57D7F7"
+ACCENT_DARK = "#416581"
+GREEN = "#65E8BD"
+RED = "#FD8C9D"
+YELLOW = "#F6C879"
 
 def startup_stylesheet() -> str:
     return f"""
@@ -2272,6 +2273,7 @@ class WalletWindow(QtWidgets.QMainWindow):
         self.setMinimumSize(1180, 720)
         self._build()
         self._apply_style()
+        self.setStyleSheet(self.styleSheet() + AURORA.stylesheet())
         self.refresh()
         self.navigate("workspace")
 
@@ -2282,7 +2284,7 @@ class WalletWindow(QtWidgets.QMainWindow):
         side = QtWidgets.QFrame(); side.setObjectName("sidebar"); side.setFixedWidth(238)
         sl = QtWidgets.QVBoxLayout(side); sl.setContentsMargins(18, 22, 18, 20); sl.setSpacing(7)
         sl.addWidget(Ui.label("ENTITY", "brand"))
-        sl.addWidget(Ui.label("UNIVERSAL DATACHIP WORKSPACE", "brandSub"))
+        sl.addWidget(Ui.label("BLACKMORE AURORA  /  CAPABILITY ECONOMY", "brandSub"))
         sl.addSpacing(24)
         self.nav_buttons = {}
         for key, label in self.NAV:
@@ -2290,8 +2292,8 @@ class WalletWindow(QtWidgets.QMainWindow):
             b.setProperty("nav", True); b.clicked.connect(lambda checked=False, k=key: self.navigate(k))
             self.nav_buttons[key] = b; sl.addWidget(b)
         sl.addStretch()
-        sl.addWidget(Ui.label("SOVEREIGN LOCAL STATE", "eyebrow"))
-        sl.addWidget(Ui.label("DATACHIP COMPOSER · ALPHA\nUnverified rights remain denied\nMarkets and treasury preserved", "sidebarFoot"))
+        sl.addWidget(Ui.label("BLACKMORE  /  SOVEREIGN LOCAL STATE", "eyebrow"))
+        sl.addWidget(Ui.label("AURORA DESIGN SYSTEM v1.0\nUnverified rights remain denied\nMarkets and treasury preserved", "sidebarFoot"))
         outer.addWidget(side)
 
         body = QtWidgets.QWidget(); bl = QtWidgets.QVBoxLayout(body)
@@ -3394,7 +3396,8 @@ def main():
     app = QtWidgets.QApplication(sys.argv)
     app.setApplicationName(APP_NAME)
     app.setStyle("Fusion")
-    app.setStyleSheet(startup_stylesheet())
+    app.setStyleSheet(startup_stylesheet() + AURORA.stylesheet())
+    app.setPalette(AURORA.palette())
 
     if not args.entity:
         setup = EntitySetupDialog(None, onboarding)
