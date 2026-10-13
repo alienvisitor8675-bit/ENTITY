@@ -18,6 +18,8 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
+from sdk.datachip.formula_chip import pack_formula_bytes
+from sdk.datachip.execution_host import execute_verified_formula
 from sdk.datachip.execution_rights import (
     active_execute_passport, issue_execution_grant, verify_execution_right,
     sign_revocation_from_authority, ExecutionDenied,
@@ -174,6 +176,64 @@ class GenuineRegistryExecuteTests(unittest.TestCase):
             key_id="revoker.ex.01",sequence=6,now=self.now,valid_seconds=600,
             authoritative_status=lambda **_:{ "complete":False,"sequence":6},
             authorized_signer=self.revoker.sign,pinned_revocation_keys=self.rev_keys)
+
+    def _host_case(self,payload=b"BTG FABRIC VERIFIED EXECUTION"):
+        file=self.root/"real.edcf"
+        receipt=pack_formula_bytes(payload,file)
+        self.issue_params["chip_id"]=receipt["chip_id"]
+        self.issue_params["content_sha256"]=hashlib.sha256(payload).hexdigest()
+        real_grant=issue_execution_grant(**self.issue_params)
+        kw=dict(path=file,
+            expected_archive_sha256=hashlib.sha256(file.read_bytes()).hexdigest(),
+            expected_assembly_sha256=self.assembly,
+            grant=real_grant,revocations=self.revocation,
+            trusted_issuer_keys=self.issuer_keys,
+            trusted_revocation_keys=self.rev_keys,
+            authenticated_subject="lab.user",
+            authenticated_audience="fabric.lab",
+            authenticated_device="lab.device.win",
+            licensed_entitlement=lambda **_:True,
+            device_attestation=lambda **_:True,
+            trusted_revocation_checkpoint=5,now=self.now)
+        return kw,hashlib.sha256(payload.upper()).hexdigest()
+
+    def test_genuine_formula_executes_without_export(self):
+        kw,expected=self._host_case()
+        result=execute_verified_formula(**kw)
+        self.assertEqual(result["output_sha256"],expected)
+        self.assertFalse(result["export_permission"])
+        self.assertFalse(result["production_ready"])
+    def test_genuine_formula_revoked_denied(self):
+        kw,_=self._host_case()
+        self.status["revoked_grant_ids"]=["grant:lab-01"]
+        kw["revocations"]=sign_revocation_from_authority(
+            key_id="revoker.ex.01",sequence=5,now=self.now-5,valid_seconds=600,
+            authoritative_status=lambda **_:self.status,
+            authorized_signer=self.revoker.sign,pinned_revocation_keys=self.rev_keys)
+        with self.assertRaises(ExecutionDenied):execute_verified_formula(**kw)
+    def test_genuine_formula_tamper_denied(self):
+        kw,_=self._host_case()
+        kw["path"].write_bytes(b"not an EDCF archive")
+        with self.assertRaises(ExecutionDenied):execute_verified_formula(**kw)
+    def test_genuine_formula_license_denied(self):
+        kw,_=self._host_case()
+        kw["licensed_entitlement"]=lambda **_:False
+        with self.assertRaises(ExecutionDenied):execute_verified_formula(**kw)
+    def test_genuine_formula_device_denied(self):
+        kw,_=self._host_case()
+        kw["device_attestation"]=lambda **_:False
+        with self.assertRaises(ExecutionDenied):execute_verified_formula(**kw)
+    def test_genuine_formula_operation_not_allowlisted(self):
+        kw,_=self._host_case()
+        kw["approved_operation"]="execute_python"
+        with self.assertRaises(ExecutionDenied):execute_verified_formula(**kw)
+    def test_genuine_formula_non_ascii_rejected(self):
+        kw,_=self._host_case(payload=b"\xff \xfe")
+        with self.assertRaises(ExecutionDenied):execute_verified_formula(**kw)
+    def test_genuine_formula_archive_identity_bound(self):
+        kw,_=self._host_case()
+        kw["expected_archive_sha256"]="0"*64
+        with self.assertRaises(ExecutionDenied):execute_verified_formula(**kw)
 
 if __name__=="__main__":
     unittest.main(verbosity=2)
