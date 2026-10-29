@@ -1,27 +1,21 @@
 ```tla
-\begin{figure}
-\begin{tla}
-\begin{align*}
-\text{{--- Digital Identity and Credentials Model in TLA+ ---}}
+\begin{module}
+  \begin{Constants}
+    \const{Subject}, \const{Isser}, \const{Claim}, \const{VerifiedClaim} \in \{\dots\}
+  \end{Constants}
 
-\text{{Constants:}}
-\text{{Subject}}, \text{{Isser}}, \text{{Claim}}, \text{{VerifiedClaim}} \in \{\text{...}\}
+  \begin{Variables}
+    \var{User} \in \{\langle \var{Subject}, \var{Isser} \rangle \}^?
 
-\text{{Variables:}}
+    \var{Issuer} \in \{\langle \var{Subject}, \var{Isser}, \var{Claim} \rangle \}^?
 
-\text{{User}} \in \{{ \text{{Subject}} \times \text{{Isser}} \}}^?
+    \var{Verification} \in \{\langle \var{Subject}, \var{Isser}, \var{VerifiedClaim} \rangle \}^?
+  \end{Variables}
 
-\text{{Issuer}} \in \{{ \text{{Subject}} \times \text{{ Isser}} \times \text{{Claim}} \}}^?
+  \begin{Invariants}
+    \forall v \in \var{Verification}. \langle v.Subject, v.Isser, v.Claim \rangle \in \var{Issuer}
 
-\text{{Verification}} \in \{{ \text{{Subject}} \times \text{{ Isser}} \times \text{{ VerifiedClaim}} \}}^?
-
-\text{{Invariants:}}
-
-\forall v \in \text{{Verification}}. \langle v.Subject, v.Isser, v.Claim \rangle \in \text{{Issuer}}
-
-\forall v \in \text{{Verification}}. \langle v.Subject, v.Isser \rangle \in \text{{User}}
-
-\end{align*}
-\end{tla}
-\end{figure}
+    \forall v \in \var{Verification}. \langle v.Subject, v.Isser \rangle \in \var{User}
+  \end{Invariants}
+\end{module}
 ```
